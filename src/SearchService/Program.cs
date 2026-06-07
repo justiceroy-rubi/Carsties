@@ -15,8 +15,8 @@ builder.Services.AddHttpClient<AuctionSvcHttpClient>().AddPolicyHandler(GetPolic
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumersFromNamespaceContaining<AuctionCreatedConsumer>();
-    x.AddConsumersFromNamespaceContaining<AuctionUpdatedConsumer>();
-    x.AddConsumersFromNamespaceContaining<AuctionDeletedConsumer>();
+    // x.AddConsumersFromNamespaceContaining<AuctionUpdatedConsumer>();
+    // x.AddConsumersFromNamespaceContaining<AuctionDeletedConsumer>();
 
     x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("search", false));
 
@@ -28,17 +28,17 @@ builder.Services.AddMassTransit(x =>
             e.ConfigureConsumer<AuctionCreatedConsumer>(context);
         });
 
-        cfg.ReceiveEndpoint("search-auction-updated", e =>
-        {
-            e.UseMessageRetry(r => r.Interval(5, 5));
-            e.ConfigureConsumer<AuctionUpdatedConsumer>(context);
-        });
+        // cfg.ReceiveEndpoint("search-auction-updated", e =>
+        // {
+        //     e.UseMessageRetry(r => r.Interval(5, 5));
+        //     e.ConfigureConsumer<AuctionUpdatedConsumer>(context);
+        // });
 
-        cfg.ReceiveEndpoint("search-auction-deleted", e =>
-        {
-            e.UseMessageRetry(r => r.Interval(5, 5)); 
-            e.ConfigureConsumer<AuctionDeletedConsumer>(context);
-        });
+        // cfg.ReceiveEndpoint("search-auction-deleted", e =>
+        // {
+        //     e.UseMessageRetry(r => r.Interval(5, 5)); 
+        //     e.ConfigureConsumer<AuctionDeletedConsumer>(context);
+        // });
         
         cfg.ConfigureEndpoints(context);
     });

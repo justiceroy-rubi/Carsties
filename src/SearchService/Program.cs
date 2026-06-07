@@ -1,16 +1,48 @@
 using System.Net;
-using MongoDB.Driver;
-using MongoDB.Entities;
 using Polly;
 using Polly.Extensions.Http;
 using SearchService.Data;
-using SearchService.Models;
 using SearchService.Services;
+using MassTransit;
+using SearchService.Consumers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();  
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddHttpClient<AuctionSvcHttpClient>().AddPolicyHandler(GetPolicy());
+
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumersFromNamespaceContaining<AuctionCreatedConsumer>();
+    x.AddConsumersFromNamespaceContaining<AuctionUpdatedConsumer>();
+    x.AddConsumersFromNamespaceContaining<AuctionDeletedConsumer>();
+
+    x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("search", false));
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.ReceiveEndpoint("search-auction-created", e =>
+        {
+            e.UseMessageRetry(r => r.Interval(5, 5));
+            e.ConfigureConsumer<AuctionCreatedConsumer>(context);
+        });
+
+        cfg.ReceiveEndpoint("search-auction-updated", e =>
+        {
+            e.UseMessageRetry(r => r.Interval(5, 5));
+            e.ConfigureConsumer<AuctionUpdatedConsumer>(context);
+        });
+
+        cfg.ReceiveEndpoint("search-auction-deleted", e =>
+        {
+            e.UseMessageRetry(r => r.Interval(5, 5)); 
+            e.ConfigureConsumer<AuctionDeletedConsumer>(context);
+        });
+        
+        cfg.ConfigureEndpoints(context);
+    });
+});
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

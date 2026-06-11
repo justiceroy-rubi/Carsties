@@ -33,9 +33,14 @@ public static class Config
             new Client
             {
                 ClientId = "nextApp", 
-                ClentName = "nextApp", 
-                ClientSecrets = { new Secret("secret".Sha256)}, 
-                AllowedGrantTypes = { GrantType.CodeAndClientCredentials }, 
+                ClientName = "nextApp", 
+                ClientSecrets = new[] { new Secret("secret".Sha256())}, 
+                AllowedGrantTypes = GrantTypes.CodeAndClientCredentials, 
+                // AllowedGrantTypes =
+                // {
+                //     GrantTypes.Code,
+                //     GrantTypes.ClientCredentials
+                // },
                 RequirePkce = false, 
                 RedirectUris = {"http://localhost:3000/api/auth/callback/id-server"}, 
                 AllowOfflineAccess = true, 

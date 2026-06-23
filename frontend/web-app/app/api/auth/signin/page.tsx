@@ -1,13 +1,7 @@
 import EmptyFilter from '@/app/components/EmptyFilter'
 import React from 'react'
 
-type Props = {
-  searchParams: Promise<{
-    callbackUrl?: string;
-  }>;
-};
-
-export default async function SignIn({ searchParams }: Props) {
+export default async function SignIn({ searchParams }: {searchParams: Promise<{callbackUrl: string}>}) {
     const { callbackUrl } = await searchParams;
   return (
     <EmptyFilter 
